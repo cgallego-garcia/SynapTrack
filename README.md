@@ -1,5 +1,7 @@
 # SynapTrack
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.17795689.svg)](https://doi.org/10.5281/zenodo.17795689)
+
 SynapTrack is an automated Fiji/ImageJ pipeline for quantifying synaptic contacts in neuronal cultures and tissue sections. 
 Built on the SynQuant segmentation engine, it performs fully unsupervised detection and quantification of synaptic puncta from fluorescence image sets that include nuclei (DAPI), dendrites (MAP2), and pre- and postsynaptic markers for excitatory or inhibitory synapses.
 
