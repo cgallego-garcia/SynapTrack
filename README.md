@@ -131,3 +131,11 @@ Example:
             ROIset_nuclei.zip
             ROIset_Synapse.zip
             SynapseDetection.tif
+
+
+## Changelog
+### v1.0.1 (2026-01-20)
+- Added defensive checks for missing Results and Summary tables
+- Improved error messages and safe termination
+
+
