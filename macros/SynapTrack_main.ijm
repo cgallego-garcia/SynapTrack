@@ -1,6 +1,6 @@
 
 /*========================================================================================
-* SynapTrack version 1.0
+* SynapTrack version 1.0.1
 * 
 * Description  : Robust, faster synapse quantification for 2D and z-stacks
 *
@@ -331,19 +331,21 @@
 			saveAs("Results", outDir+"Synapse Quantification Feature Table.xls");
 			run("Close");
 		}
-
-
-	
+		
 	// Append results into the global "Summary" table (one row per image set)
 		selectWindow("Summary");
 		Table.set("Experiment", row, expPrefix+i);
-		Table.set("# Cells", row, nCells);
-		Table.set("Total # synapses", row, totRes);
+		Table.set("Cells", row, nCells);
+		Table.set("Total_synapses", row, totRes);
 		Table.set("Synapses/cell", row, totRes/nCells);
-		Table.set("Dendrite Length (µm)", row, totDenLen[0]);
-		Table.set("Synapse/10 µm dendrite", row, totRes/totDenLen[0]*10);
+		Table.set("Dendrite_Length(µm)", row, totDenLen[0]);
+		Table.set("Synapse/10µm_dendrite", row, totRes/totDenLen[0]*10);
 		Table.update;
 		row++;
+		
+		tableCheck = Table.getColumn("Cells");
+		if (tableCheck.length < 1) { exit("Summary table is empty"); }
+		
 	// Clean workspace to free memory before next iteration
 		cleanWorkspace();
 	}
@@ -352,48 +354,53 @@
  *  After looping all image sets, compute mean / STD / SEM for each metric and save
  *  results.xls containing per-set rows + aggregated statistics.
  ====================================================================================== */
+	
+// Summary check
 	selectWindow("Summary");
-	totalNucl = Table.getColumn("# Cells");
-	totalSyn = Table.getColumn("Total # synapses");
+	totalNucl = Table.getColumn("Cells");
+	totalSyn = Table.getColumn("Total_synapses");
 	Synpercel = Table.getColumn("Synapses/cell");
-	estimatedTotal = Table.getColumn("Dendrite Length (µm)");
-	synapseDendrite = Table.getColumn("Synapse/10 µm dendrite");
+	estimatedTotal = Table.getColumn("Dendrite_Length(µm)");
+	synapseDendrite = Table.getColumn("Synapse/10µm_dendrite");
 	
-	Table.set("Experiment", row, "Avg");
-	Table.set("Experiment", row+1, "STD");
-	Table.set("Experiment", row+2, "SEM");
+	if (totalNucl.length < 1) { exit("Summary table is empty"); }
 	
-	// For each vector, compute statistics and place in the table (AVG / STD / SEM)
-	Array.getStatistics(totalNucl, min, max, mean, stdDev);
-	Table.set("# Cells", row, mean);
-	Table.set("# Cells", row+1, stdDev);
-	Table.set("# Cells", row+2, stdDev/sqrt(totalNucl.length));
+	else {
+		Table.set("Experiment", row, "Avg");
+		Table.set("Experiment", row+1, "STD");
+		Table.set("Experiment", row+2, "SEM");
+		
+		// For each vector, compute statistics and place in the table (AVG / STD / SEM)
+		Array.getStatistics(totalNucl, min, max, mean, stdDev);
+		Table.set("Cells", row, mean);
+		Table.set("Cells", row+1, stdDev);
+		Table.set("Cells", row+2, stdDev/sqrt(totalNucl.length));
+		
+		Array.getStatistics(totalSyn, min, max, mean, stdDev);
+		Table.set("Total_synapses", row, mean);
+		Table.set("Total_synapses", row+1, stdDev);
+		Table.set("Total_synapses", row+2, stdDev/sqrt(totalSyn.length));
+		
+		Array.getStatistics(Synpercel, min, max, mean, stdDev);
+		Table.set("Synapses/cell", row, mean);
+		Table.set("Synapses/cell", row+1, stdDev);
+		Table.set("Synapses/cell", row+2, stdDev/sqrt(Synpercel.length));
+		
+		Array.getStatistics(estimatedTotal, min, max, mean, stdDev);
+		Table.set("Dendrite_Length(µm)", row, mean);
+		Table.set("Dendrite_Length(µm)", row+1, stdDev);
+		Table.set("Dendrite_Length(µm)", row+2, stdDev/sqrt(estimatedTotal.length));
 	
-	Array.getStatistics(totalSyn, min, max, mean, stdDev);
-	Table.set("Total # synapses", row, mean);
-	Table.set("Total # synapses", row+1, stdDev);
-	Table.set("Total # synapses", row+2, stdDev/sqrt(totalSyn.length));
-	
-	Array.getStatistics(Synpercel, min, max, mean, stdDev);
-	Table.set("Synapses/cell", row, mean);
-	Table.set("Synapses/cell", row+1, stdDev);
-	Table.set("Synapses/cell", row+2, stdDev/sqrt(Synpercel.length));
-	
-	Array.getStatistics(estimatedTotal, min, max, mean, stdDev);
-	Table.set("Dendrite Length (µm)", row, mean);
-	Table.set("Dendrite Length (µm)", row+1, stdDev);
-	Table.set("Dendrite Length (µm)", row+2, stdDev/sqrt(estimatedTotal.length));
-
-	Array.getStatistics(synapseDendrite, min, max, mean, stdDev);
-	Table.set("Synapse/10 µm dendrite", row, mean);
-	Table.set("Synapse/10 µm dendrite", row+1, stdDev);
-	Table.set("Synapse/10 µm dendrite", row+2, stdDev/sqrt(synapseDendrite.length));
-	
-	Table.update;
-	
-	saveAs("Results", outpuDir+"Results.xls");
-	run("Close");
-	
+		Array.getStatistics(synapseDendrite, min, max, mean, stdDev);
+		Table.set("Synapse/10µm_dendrite", row, mean);
+		Table.set("Synapse/10µm_dendrite", row+1, stdDev);
+		Table.set("Synapse/10µm_dendrite", row+2, stdDev/sqrt(synapseDendrite.length));
+		
+		Table.update;
+		
+		saveAs("Results", outpuDir+"Results.xls");
+		run("Close");
+	}
 	
 	
 /* ============================ FUNCTIONS ===========================================
@@ -435,7 +442,16 @@
 			// If table has rows, delete them (reset)
 			if (Table.size > 0) { for (t = Table.size; t >= 0; t--) { Table.deleteRows(0, t, "Summary"); } }
 		}
-		else { Table.create("Summary"); }
+		else { 
+			Table.create("Summary");
+			Table.set("Experiment", 0, 0);
+			Table.set("Cells", 0, 0);
+			Table.set("Total_synapses", 0, 0);
+			Table.set("Synapses/cell", 0, 0);
+			Table.set("Dendrite_Length(µm)", 0, 0);
+			Table.set("Synapse/10µm_dendrite", 0, 0);
+			Table.deleteRows(0, 0);
+		}
  // create if missing
 		tablePosition();
 	}
