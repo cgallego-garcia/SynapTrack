@@ -18,33 +18,46 @@ Built on the SynQuant segmentation engine, it performs fully unsupervised detect
 
 ---
 
-## Requirements
+## Getting Started
+### Requirements
+**Before using SynapTrack, make sure you have the following installed:**
+- **Fiji / ImageJ**  
+  - Recommended versions: Fiji ≥ 2.16 / ImageJ ≥ 1.53f  
+  - [Download Fiji here]([https://imagej.net/software/fiji/downloads](https://imagej.net/software/fiji/downloads))
+    
+- **Java**  
+  - Version ≥ 8
 
-* Fiji/ImageJ (recommended ≥ 2.16/1.53f) (Download [here](https://imagej.net/software/fiji/downloads))
-* Java ≥ 8
-* Required plugins:
-	* Bio-Formats Importer
-	* StarDist 2D
-	* CSBDeep / TensorFlow
-	* IJPB plugins (MorphoLibJ)
-	* Neuronanatomy
-	* [SynQuant 1.2.8](https://github.com/yu-lab-vt/SynQuant)
+- **Required Plugins** (install most plugins via `Fiji's Help > Update...` by activating the corresponding update site):
+
+| Plugin | Version |
+|--------|---------|
+| Bio-Formats | ≥ 8.4.0 |
+| StarDist 2D | ≥ 0.7.0 |
+| CSBDeep | ≥ 2.0 |
+| TensorFlow | ≥ 0.6.0 |
+| IJPB plugins (MorphoLibJ) | ≥ 7.0.0 |
+| Neuronanatomy | ≥ 1.6.0 |
+| SynQuant | 1.2.8 |
+> **Note:** SynQuant requires manual installation as follows:  
+> 1. Download the plugin from [SynQuant GitHub Repository](https://github.com/yu-lab-vt/SynQuant).
+> 2. Copy it into: `Fiji.app/plugins`
 
 ---
 
-## Installation and Basic Use
+### **Basic Use**
+1. **Download SynapTrack** and the associated macros from this repository.
+2. **Copy the `SynapTrack` folder** into the Fiji plugin directory: `Fiji.app/plugins`
+3. Restart Fiji to ensure the plugin is recognized.
 
-1. Download SynapTrack and the associated macros from this repository
-2. Copy the downloaded SynapTrack folder in `Fiji.app/plugins`
-3. Restart FIJI
-
-4. Run SynapTrack. It could be done in two-ways:
+4. Execute SynapTrack. It could be done in two-ways:
 
     (A) Drag and drop the `SynapTrack.ijm` file and press `Run`
 
     (B) SynapTrack will appear as an option under `Plugins > SynapTrack`
 
-5. Adjust parameters.
+5. Specify the parameters for your analysis (e.g., dendrite channel, synaptic channels, thresholds) and run the analysis.  
+   - *Adjust parameters (*see Interactive Parameters panel below*) as needed.*
 6. Run the analysis to generate synaptic density and associated metrics.
 
 ---
@@ -74,9 +87,7 @@ If your data are in proprietary formats (.czi, .vsi, .nd2, .lif, etc.), you can 
 -   Image index range (First-Last image sets to be analysed)
 -   Synapse type (excitatory / inhibitory)
 
-#### Image Calibration
-
-(If images are not calibrated)
+#### Image Calibration *(If images are not calibrated)*
 -   Pixel size (µm/pixel)
 -   Camera binning (if metadata is missing)
 
