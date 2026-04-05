@@ -1,12 +1,12 @@
 
 /*========================================================================================
-* SynapTrack - Tissue version 1.0
+* SynapTrack - Tissue version 1.1
 * 
 * Description  : Robust, faster synapse quantification for 2D and z-stacks
 *
 * Authors      : Carlos Gallego-Garcia, Elena Martinez-Blanco & Fco. Javier Diez-Guerra
 * Facility     : Advanced Light Microscopy Facility (SMOA), CBM
-* Created      : 2025-06-28
+* Created      : 2026-02-24
 *
 * Requirements : Fiji (with Bio-Formats), StarDist 2D, CSBDeep, TensorFlow,
 *                IJPB plugins (MorphoLibJ), Neuronanatomy, SynQuant 1.2.8
@@ -18,12 +18,13 @@
  *  and sets channel name patterns used across the macro.
  =========================================================================== */
 	requires("1.53f");		// Ensure the required ImageJ/Fiji version
+	pluginCheck(); 			// Ensure that the required plugins are installed
 	row = initWorkspace();	// Clean/initialize the workspace (defined below) and set Row index for summary table accumulation
 	
 // Channel name patterns used to build file names and logical mapping
 	excitatory = newArray("preEx","postEx");
 	inhibitory = newArray("preInh","postInh");
-	logical   = newArray("preSyn","postSyn");
+	logical    = newArray("preSyn","postSyn");
 	
 /* ============================ PARAMETERS DIALOGUE ======================================
  *  GUI for user to supply experiment paths and algorithm parameters.
@@ -33,7 +34,7 @@
 // ====== EXPERIMENT DATA ======
 	Dialog.addMessage("Input Data", 16);
 	Dialog.addDirectory("Input images folder:", File.getDefaultDir);
-	Dialog.addString("Experiment Prefix:", "TissuEX_"); Dialog.addToSameRow();
+	Dialog.addString("Experiment Prefix:", "TissuEX"); Dialog.addToSameRow();
 	Dialog.addNumber("First ImageSet to analyze:", 1); Dialog.addToSameRow();
 	Dialog.addNumber("Last ImageSet to analyze:", "");
 	Dialog.addChoice("Synapse type:", newArray("Excitatory","Inhibitory"), "Excitatory");
@@ -116,7 +117,7 @@
 		ok = true;
 		pathList = newArray(chList.length);
 		for (c=0; c<chList.length; c++) {
-			p = inDir + expPrefix + chList[c] + "_" + idStr + ".tif";
+			p = inDir + expPrefix + "_" + chList[c] + "_" + idStr + ".tif";
 			pathList[c] = p;
 			if (!File.exists(p)) {
 				// Warn and exit: user probably selected wrong synapse type or prefix
@@ -171,8 +172,10 @@
 		getPixelSize(unit, pxSize, pixelHeight);
 		selectImage("postSyn");
 		rb_sub(rollSyn, pxSize);	// background for post-synaptic channel
+		run("Subtract...", "value=250");
 		selectImage("preSyn");
 		rb_sub(rollSyn, pxSize);	// background for pre-synaptic channel
+		run("Subtract...", "value=2000");
 		
 	// SynQuant analysis
 	// Check whether pre/post synapse images are still open after preprocessing
@@ -221,7 +224,7 @@
 		
 	// Append results into the global "Summary" table (one row per image set)
 		selectWindow("Summary");
-		Table.set("Experiment", row, expPrefix+i);
+		Table.set("Experiment", row, expPrefix+"_"+i);
 		Table.set("Total # synapses", row, totRes);
 		Table.set("Synapse density (/10 µm²)", row, (totRes/imgArea)*10);
 		Table.update;
@@ -400,4 +403,23 @@
 	}
 	
 	
+	function pluginCheck() {
+		pluginsSynap = newArray("Bio-Formats", "StarDist 2D", "CSBDeep", "TensorFlow", "IJPB-plugins (MorpholibJ)","Neuroanatomy","SynQuant");
+		pluginsRequired = newArray("Bio-Formats", "StarDist 2D", "N2V predict",	"TensorFlow...", "MorphoLibJ...","Neuroanatomy Shortcut Window","SynQuantVid ");
+		List.setCommands;
+		
+		missingPlug = newArray();
+		for (i = 0; i < pluginsRequired.length; i++) {
+			if (List.get(pluginsRequired[i]) == "") { 
+				missingPlug = Array.concat(missingPlug,pluginsSynap[i]); 
+			}
+		}
+		
+		if (missingPlug.length > 0) {
+			for (p = 0; p < missingPlug.length; p++) { 
+				print(missingPlug[p] + " is not installed ❌"); 
+			}
+			exit("If you want to execute SynapTrack the plugins listed in the Log file must be installed");
+		}
+	}
 	

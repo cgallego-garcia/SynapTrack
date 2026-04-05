@@ -1,12 +1,12 @@
 
 /*========================================================================================
-* SynapTrack version 1.0.1
+* SynapTrack version 1.1
 * 
 * Description  : Robust, faster synapse quantification for 2D and z-stacks
 *
 * Authors      : Carlos Gallego-Garcia, Elena Martinez-Blanco & Fco. Javier Diez-Guerra
 * Facility     : Advanced Light Microscopy Facility (SMOA), CBM
-* Created      : 2025-06-28
+* Created      : 2026-02-24
 *
 * Requirements : Fiji (with Bio-Formats), StarDist 2D, CSBDeep, TensorFlow,
 *                IJPB plugins (MorphoLibJ), Neuronanatomy, SynQuant 1.2.8
@@ -17,14 +17,14 @@
  *  Minimal initialization and global constants. This section prepares Fiji
  *  and sets channel name patterns used across the macro.
  =========================================================================== */
-	requires("1.53f");
-		// Ensure the required ImageJ/Fiji version
+	requires("1.53f"); 		// Ensure the required ImageJ/Fiji version
+	pluginCheck();			// Ensure that the required plugins are installed
 	row = initWorkspace();	// Clean/initialize the workspace (defined below) and set Row index for summary table accumulation
 	
 // Channel name patterns used to build file names and logical mapping
 	excitatory = newArray("preEx","postEx","MAP2","DAPI");
 	inhibitory = newArray("preInh","postInh","MAP2","DAPI");
-	logical   = newArray("preSyn","postSyn","dendrites","nuclei");
+	logical    = newArray("preSyn","postSyn","dendrites","nuclei");
 	
 /* ============================ PARAMETERS DIALOGUE ======================================
  *  GUI for user to supply experiment paths and algorithm parameters.
@@ -34,7 +34,7 @@
 // ====== EXPERIMENT DATA ======
 	Dialog.addMessage("Input Data", 16);
 	Dialog.addDirectory("Input images folder:", File.getDefaultDir);
-	Dialog.addString("Experiment Prefix:", "Exp_01_");
+	Dialog.addString("Experiment Prefix:", "Exp");
  Dialog.addToSameRow();
 	Dialog.addNumber("First ImageSet to analyze:", 1); Dialog.addToSameRow();
 	Dialog.addNumber("Last ImageSet to analyze:", "");
@@ -52,8 +52,8 @@
 	// Dendrite enhance signal (CLAHE)
 	Dialog.addMessage("Enhance Local Contrast Dendrites");
 	Dialog.addNumber("Block Size", 125); Dialog.addToSameRow();
-	Dialog.addNumber("Histogram", 256); Dialog.addToSameRow();
-	Dialog.addNumber("Maximum", 6);
+	Dialog.addNumber("Histogram bins", 256); Dialog.addToSameRow();
+	Dialog.addNumber("Maximum Slope", 6);
 	// Background subtraction
 	Dialog.addMessage("Background subtraction: Rolling Ball radius (µm)"); 
 	Dialog.addNumber("Nuclei:", 16.25); Dialog.addToSameRow();
@@ -97,7 +97,7 @@
 	inDir     = Dialog.getString();
  
 	outpuDir = inDir+"Results"+File.separator; File.makeDirectory(outpuDir);
-	expPrefix = Dialog.getString();
+	expPrefix = Dialog.getString(); 
 	firstIdx  = Dialog.getNumber();
 	lastIdx   = Dialog.getNumber();
 	sType     = Dialog.getChoice();
@@ -158,7 +158,7 @@
 		ok = true;
 		pathList = newArray(chList.length);
 		for (c=0; c<chList.length; c++) {
-			p = inDir + expPrefix + chList[c] + "_" + idStr + ".tif";
+			p = inDir + expPrefix + "_" + chList[c] + "_" + idStr + ".tif";
 			pathList[c] = p;
 			if (!File.exists(p)) {
 				// Warn and exit: user probably selected wrong synapse type or prefix
@@ -190,48 +190,48 @@
 			if (isZ) {
 				if (zMode == "MaxIP") { run("Z Project...", "projection=[Max Intensity]"); selectImage(rawID); close(); }
 				else if (zMode == "MeanIP") { run("Z Project...", "projection=[Sum Slices]"); selectImage(rawID); }
-				// After projection, pick the last opened image (project result)
+			// After projection, pick the last opened image (project result)
 				titles = getList("image.titles");
 				selectImage(titles[lengthOf(titles)-1]);
 			}
 			
 			else if (!isZ) {
 				getDimensions(width, height, channels, slices, frames);
-				// If user didn't mark Z, but file has multiple slices, abort to avoid wrong processing
+			// If user didn't mark Z, but file has multiple slices, abort to avoid wrong processing
 				if (slices > 1) { cleanWorkspace(); exit("Input data are Z-stacks and Z-stack option was not checked"); }
 			}
 			
-			rename(logical[c]);
 		// rename to a predictable logical name
+			rename(logical[c]);
+		// store the new title in the imgs array
 			imgs[c] = getTitle();
-	// store the new title in the imgs array
 		}
 
 		tileImages(); // arrange open images on screen for convenience
 	
-		// Background subtraction and dendrite enhancement
+	// Background subtraction and dendrite enhancement
 		getPixelSize(unit, pxSize, pixelHeight);
 		selectImage("nuclei");
 		rb_sub(rollNuc, pxSize);	// rolling-ball background for nuclei
 		selectImage("dendrites");
-		dendriteProcessing(blockSize, claheHist,claheMax); // CLAHE on dendrites
 		rb_sub(rollDen, pxSize);	// rolling-ball background for dendrites
+		dendriteProcessing(blockSize, claheHist,claheMax); // CLAHE on dendrites
 		selectImage("postSyn");
 		rb_sub(rollSyn, pxSize);	// background for post-synaptic channel
 		selectImage("preSyn");
 		rb_sub(rollSyn, pxSize);	// background for pre-synaptic channel
 		
 	// Nuclei Segmentation and filtering based on StarDist
-		stardist2d_segment("nuclei", probT, nmsT, nTiles);
-			// runs StarDist 2D
-		nCells = nuclei_filter(minCell, maxCell, cirCell, outDir);
+		stardist2d_segment("nuclei", probT, nmsT, nTiles); // runs StarDist 2D
+		
 	// filter ROIs and return count
+		nCells = nuclei_filter(minCell, maxCell, cirCell, outDir);
 		
 	// Dendrite arborization: create a mask + remove nuclear regions
 		selectImage("dendrites");
 		run("Duplicate...", "title=Dendrite-Mask duplicate"); tileImages();
 		run("Convert to Mask");
-		nucleiDeletion(outDir);	// clear regions where nuclei are present from dendrite mask
+		if (nCells > 0) { nucleiDeletion(outDir); }	// clear regions where nuclei are present from dendrite mask
 		
 		// Skeletonization of dendrites for length estimation
 		run("Select None");
@@ -331,21 +331,19 @@
 			saveAs("Results", outDir+"Synapse Quantification Feature Table.xls");
 			run("Close");
 		}
-		
+
+
+	
 	// Append results into the global "Summary" table (one row per image set)
 		selectWindow("Summary");
-		Table.set("Experiment", row, expPrefix+i);
-		Table.set("Cells", row, nCells);
-		Table.set("Total_synapses", row, totRes);
+		Table.set("Experiment", row, expPrefix+"_"+i);
+		Table.set("# Cells", row, nCells);
+		Table.set("Total # synapses", row, totRes);
 		Table.set("Synapses/cell", row, totRes/nCells);
-		Table.set("Dendrite_Length(µm)", row, totDenLen[0]);
-		Table.set("Synapse/10µm_dendrite", row, totRes/totDenLen[0]*10);
+		Table.set("Dendrite Length (µm)", row, totDenLen[0]);
+		Table.set("Synapse/10 µm dendrite", row, totRes/totDenLen[0]*10);
 		Table.update;
 		row++;
-		
-		tableCheck = Table.getColumn("Cells");
-		if (tableCheck.length < 1) { exit("Summary table is empty"); }
-		
 	// Clean workspace to free memory before next iteration
 		cleanWorkspace();
 	}
@@ -354,53 +352,48 @@
  *  After looping all image sets, compute mean / STD / SEM for each metric and save
  *  results.xls containing per-set rows + aggregated statistics.
  ====================================================================================== */
-	
-// Summary check
 	selectWindow("Summary");
-	totalNucl = Table.getColumn("Cells");
-	totalSyn = Table.getColumn("Total_synapses");
+	totalNucl = Table.getColumn("# Cells");
+	totalSyn = Table.getColumn("Total # synapses");
 	Synpercel = Table.getColumn("Synapses/cell");
-	estimatedTotal = Table.getColumn("Dendrite_Length(µm)");
-	synapseDendrite = Table.getColumn("Synapse/10µm_dendrite");
+	estimatedTotal = Table.getColumn("Dendrite Length (µm)");
+	synapseDendrite = Table.getColumn("Synapse/10 µm dendrite");
 	
-	if (totalNucl.length < 1) { exit("Summary table is empty"); }
+	Table.set("Experiment", row, "Avg");
+	Table.set("Experiment", row+1, "STD");
+	Table.set("Experiment", row+2, "SEM");
 	
-	else {
-		Table.set("Experiment", row, "Avg");
-		Table.set("Experiment", row+1, "STD");
-		Table.set("Experiment", row+2, "SEM");
-		
-		// For each vector, compute statistics and place in the table (AVG / STD / SEM)
-		Array.getStatistics(totalNucl, min, max, mean, stdDev);
-		Table.set("Cells", row, mean);
-		Table.set("Cells", row+1, stdDev);
-		Table.set("Cells", row+2, stdDev/sqrt(totalNucl.length));
-		
-		Array.getStatistics(totalSyn, min, max, mean, stdDev);
-		Table.set("Total_synapses", row, mean);
-		Table.set("Total_synapses", row+1, stdDev);
-		Table.set("Total_synapses", row+2, stdDev/sqrt(totalSyn.length));
-		
-		Array.getStatistics(Synpercel, min, max, mean, stdDev);
-		Table.set("Synapses/cell", row, mean);
-		Table.set("Synapses/cell", row+1, stdDev);
-		Table.set("Synapses/cell", row+2, stdDev/sqrt(Synpercel.length));
-		
-		Array.getStatistics(estimatedTotal, min, max, mean, stdDev);
-		Table.set("Dendrite_Length(µm)", row, mean);
-		Table.set("Dendrite_Length(µm)", row+1, stdDev);
-		Table.set("Dendrite_Length(µm)", row+2, stdDev/sqrt(estimatedTotal.length));
+	// For each vector, compute statistics and place in the table (AVG / STD / SEM)
+	Array.getStatistics(totalNucl, min, max, mean, stdDev);
+	Table.set("# Cells", row, mean);
+	Table.set("# Cells", row+1, stdDev);
+	Table.set("# Cells", row+2, stdDev/sqrt(totalNucl.length));
 	
-		Array.getStatistics(synapseDendrite, min, max, mean, stdDev);
-		Table.set("Synapse/10µm_dendrite", row, mean);
-		Table.set("Synapse/10µm_dendrite", row+1, stdDev);
-		Table.set("Synapse/10µm_dendrite", row+2, stdDev/sqrt(synapseDendrite.length));
-		
-		Table.update;
-		
-		saveAs("Results", outpuDir+"Results.xls");
-		run("Close");
-	}
+	Array.getStatistics(totalSyn, min, max, mean, stdDev);
+	Table.set("Total # synapses", row, mean);
+	Table.set("Total # synapses", row+1, stdDev);
+	Table.set("Total # synapses", row+2, stdDev/sqrt(totalSyn.length));
+	
+	Array.getStatistics(Synpercel, min, max, mean, stdDev);
+	Table.set("Synapses/cell", row, mean);
+	Table.set("Synapses/cell", row+1, stdDev);
+	Table.set("Synapses/cell", row+2, stdDev/sqrt(Synpercel.length));
+	
+	Array.getStatistics(estimatedTotal, min, max, mean, stdDev);
+	Table.set("Dendrite Length (µm)", row, mean);
+	Table.set("Dendrite Length (µm)", row+1, stdDev);
+	Table.set("Dendrite Length (µm)", row+2, stdDev/sqrt(estimatedTotal.length));
+
+	Array.getStatistics(synapseDendrite, min, max, mean, stdDev);
+	Table.set("Synapse/10 µm dendrite", row, mean);
+	Table.set("Synapse/10 µm dendrite", row+1, stdDev);
+	Table.set("Synapse/10 µm dendrite", row+2, stdDev/sqrt(synapseDendrite.length));
+	
+	Table.update;
+	
+	saveAs("Results", outpuDir+"Results.xls");
+	run("Close");
+	
 	
 	
 /* ============================ FUNCTIONS ===========================================
@@ -442,16 +435,7 @@
 			// If table has rows, delete them (reset)
 			if (Table.size > 0) { for (t = Table.size; t >= 0; t--) { Table.deleteRows(0, t, "Summary"); } }
 		}
-		else { 
-			Table.create("Summary");
-			Table.set("Experiment", 0, 0);
-			Table.set("Cells", 0, 0);
-			Table.set("Total_synapses", 0, 0);
-			Table.set("Synapses/cell", 0, 0);
-			Table.set("Dendrite_Length(µm)", 0, 0);
-			Table.set("Synapse/10µm_dendrite", 0, 0);
-			Table.deleteRows(0, 0);
-		}
+		else { Table.create("Summary"); }
  // create if missing
 		tablePosition();
 	}
@@ -486,6 +470,7 @@
 
 	function dendriteProcessing(blockSize, claheHist,claheMax) {
 		// Dendrite enhancement using CLAHE
+		run("Gaussian Blur...", "sigma=1");
 		run("Enhance Local Contrast (CLAHE)", "blocksize="+blockSize+" histogram="+claheHist+" maximum="+claheMax+" mask=*None*");
 	}
 
@@ -558,38 +543,43 @@
 	 *  - Remaining ROIs are saved to ROIset_nuclei.zip in outDir.
 	 *  - Returns: n (number of nuclei kept) 
 	 */
-		selectWindow("nuclei");
-		roiManager("measure");
-					// generate Results table with measurements
-		nuclCirc = Table.getColumn("Circ.");
-	// circularity column
-		nuclArea = Table.getColumn("Area");
-		// area column
-		close("Results");
-		nucl_to_delete = newArray();
-		
-		
-// Build a list of indices to delete based on thresholds
-		for (i = 0; i < nuclCirc.length; i++) {
-			if (nuclCirc[i] < circA || nuclArea[i] < minA || nuclArea[i] > maxA) {
-				nucl_to_delete = Array.concat(nucl_to_delete,i);
+		if (roiManager("count") > 0) {
+			selectWindow("nuclei");
+			roiManager("measure");
+						// generate Results table with measurements
+			nuclCirc = Table.getColumn("Circ.");
+		// circularity column
+			nuclArea = Table.getColumn("Area");
+			// area column
+			close("Results");
+			nucl_to_delete = newArray();
+			
+			
+	// Build a list of indices to delete based on thresholds
+			for (i = 0; i < nuclCirc.length; i++) {
+				if (nuclCirc[i] < circA || nuclArea[i] < minA || nuclArea[i] > maxA) {
+					nucl_to_delete = Array.concat(nucl_to_delete,i);
+				}
 			}
+			
+			roiManager("deselect");
+			if (nucl_to_delete.length > 0) {
+			// Delete the filtered ROIs from the ROI Manager
+				roiManager("select", nucl_to_delete);
+				roiManager("delete");
+			}
+			// Show all remaining ROIs (without labels) and then hide them again
+			roiManager("show all without labels");
+			roiManager("show none");
+			n = roiManager("count");
+		// count remaining nuclei
+			// If any nuclei remain, save them for later (nucleiDeletion will use this)
+			if (n > 0) { roiManager("save", outDir+"ROIset_nuclei.zip"); close("ROI Manager"); }
+			close("ROI Manager");
 		}
-		
-		roiManager("deselect");
-		if (nucl_to_delete.length > 0) {
-		// Delete the filtered ROIs from the ROI Manager
-			roiManager("select", nucl_to_delete);
-			roiManager("delete");
+		else {
+			n = 0;
 		}
-		// Show all remaining ROIs (without labels) and then hide them again
-		roiManager("show all without labels");
-		roiManager("show none");
-		n = roiManager("count");
-	// count remaining nuclei
-		// If any nuclei remain, save them for later (nucleiDeletion will use this)
-		if (n > 0) { roiManager("save", outDir+"ROIset_nuclei.zip"); close("ROI Manager"); }
-		close("ROI Manager");
 		return n;
 	}
 	
@@ -628,6 +618,41 @@
 		pxArea = round(synSize/pow(pixSize, 2));
 		return pxArea
 	}
+	
+	function pluginCheck() {
+		pluginsSynap = newArray("Bio-Formats", "StarDist 2D", "CSBDeep", "TensorFlow", "IJPB-plugins (MorpholibJ)","Neuroanatomy","SynQuant");
+		pluginsRequired = newArray("Bio-Formats", "StarDist 2D", "N2V predict",	"TensorFlow...", "MorphoLibJ...","Neuroanatomy Shortcut Window","SynQuantVid ");
+		List.setCommands;
+		
+		missingPlug = newArray();
+		for (i = 0; i < pluginsRequired.length; i++) {
+			if (List.get(pluginsRequired[i]) == "") { 
+				missingPlug = Array.concat(missingPlug,pluginsSynap[i]); 
+			}
+		}
+		
+		if (missingPlug.length > 0) {
+			for (p = 0; p < missingPlug.length; p++) { 
+				print(missingPlug[p] + " is not installed ❌"); 
+			}
+			exit("If you want to execute SynapTrack the plugins listed in the Log file must be installed");
+		}
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	
 	
 	
