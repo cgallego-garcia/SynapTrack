@@ -34,8 +34,7 @@
 // ====== EXPERIMENT DATA ======
 	Dialog.addMessage("Input Data", 16);
 	Dialog.addDirectory("Input images folder:", File.getDefaultDir);
-	Dialog.addString("Experiment Prefix:", "Exp");
- Dialog.addToSameRow();
+	Dialog.addString("Experiment Prefix:", "Exp"); Dialog.addToSameRow();
 	Dialog.addNumber("First ImageSet to analyze:", 1); Dialog.addToSameRow();
 	Dialog.addNumber("Last ImageSet to analyze:", "");
 	Dialog.addChoice("Synapse type:", newArray("Excitatory","Inhibitory"), "Excitatory");
@@ -49,16 +48,20 @@
 	
 // ====== IMAGE PREPROCESSING ======
 	Dialog.addMessage("Image Preprocessing", 16);
-	// Dendrite enhance signal (CLAHE)
-	Dialog.addMessage("Enhance Local Contrast Dendrites");
-	Dialog.addNumber("Block Size", 125); Dialog.addToSameRow();
-	Dialog.addNumber("Histogram bins", 256); Dialog.addToSameRow();
-	Dialog.addNumber("Maximum Slope", 6);
 	// Background subtraction
 	Dialog.addMessage("Background subtraction: Rolling Ball radius (µm)"); 
 	Dialog.addNumber("Nuclei:", 16.25); Dialog.addToSameRow();
 	Dialog.addNumber("Synapses:", 4.88); Dialog.addToSameRow();
 	Dialog.addNumber("Dendrites:", 6.5);
+	// Dendrite enhance signal (CLAHE)
+	Dialog.addMessage("Enhance Local Contrast Dendrites");
+	Dialog.addNumber("Block Size", 125); Dialog.addToSameRow();
+	Dialog.addNumber("Histogram bins", 256); Dialog.addToSameRow();
+	Dialog.addNumber("Maximum Slope", 6);
+	// Dendrite Gaussian Filter
+	Dialog.addMessage("Dendrites Gaussian Blur Filter");
+	Dialog.addNumber("Sigma Filter (µm)", 0.16);
+	
 	// Z-stack processing
 	Dialog.addCheckbox("Input are z-stacks?", false); Dialog.addToSameRow();
 	Dialog.addChoice("Z handling:", newArray("MaxIP","SumIP"), "MaxIP");
@@ -81,8 +84,7 @@
 	Dialog.addNumber("Max synapse size (µm²):", 1.1);
 	// Intensity thresholds
 	Dialog.addNumber("Min fill (0-1):", 0.5); Dialog.addToSameRow();
-	Dialog.addNumber("Max WH ratio:", 3);
- Dialog.addToSameRow();
+	Dialog.addNumber("Max WH ratio:", 3); Dialog.addToSameRow();
 	// Advanced
 	Dialog.addNumber("zScore adjustment:", 10);
 // ====== Enlarge Dendrite Mask ======
@@ -104,14 +106,16 @@
 // Image calibration
 	calImg	  = Dialog.getChoice();
 	px_um     = Dialog.getNumber() * Dialog.getNumber(); // returns -> calibration * binning
-// CLAHE
-	blockSize = Dialog.getNumber();
-	claheHist = Dialog.getNumber();
-	claheMax  = Dialog.getNumber();
 // Background
 	rollNuc   = Dialog.getNumber();
 	rollSyn   = Dialog.getNumber();
 	rollDen   = Dialog.getNumber();
+// CLAHE
+	blockSize = Dialog.getNumber();
+	claheHist = Dialog.getNumber();
+	claheMax  = Dialog.getNumber();
+// Gaussian Filter
+	gaussian  = Dialog.getNumber();
 // Z-stacks handling
 	isZ       = Dialog.getCheckbox();
 	zMode     = Dialog.getChoice();
@@ -215,7 +219,7 @@
 		rb_sub(rollNuc, pxSize);	// rolling-ball background for nuclei
 		selectImage("dendrites");
 		rb_sub(rollDen, pxSize);	// rolling-ball background for dendrites
-		dendriteProcessing(blockSize, claheHist,claheMax); // CLAHE on dendrites
+		dendriteProcessing(blockSize, claheHist, claheMax); // CLAHE on dendrites
 		selectImage("postSyn");
 		rb_sub(rollSyn, pxSize);	// background for post-synaptic channel
 		selectImage("preSyn");
@@ -468,10 +472,10 @@
 		run("Subtract Background...",  "rolling="+round(rolling/pxSize));
 	}
 
-	function dendriteProcessing(blockSize, claheHist,claheMax) {
+	function dendriteProcessing(blockSize, claheHist, claheMax, gaussian, pxSize) {
 		// Dendrite enhancement using CLAHE
-		run("Gaussian Blur...", "sigma=1");
 		run("Enhance Local Contrast (CLAHE)", "blocksize="+blockSize+" histogram="+claheHist+" maximum="+claheMax+" mask=*None*");
+		run("Gaussian Blur...", "sigma="+(gaussian/pxSize));
 	}
 
 	function scale_current(f,rawID){
