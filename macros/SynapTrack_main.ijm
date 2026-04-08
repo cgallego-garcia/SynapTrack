@@ -39,15 +39,15 @@
 	Dialog.addNumber("Last ImageSet to analyze:", "");
 	Dialog.addChoice("Synapse type:", newArray("Excitatory","Inhibitory"), "Excitatory");
 	
-// ====== IMAGE CALIBRATION ======
-	Dialog.addMessage("Image Calibration", 16);
+// ====== SPATIAL CALIBRATION ======
+	Dialog.addMessage("Spatial Calibration", 16);
 	Dialog.addChoice("Are the images Calibrated?", newArray("Yes","No"), "Yes"); Dialog.addToSameRow();
 	Dialog.addMessage("If not, please introduce the following:");
 	Dialog.addNumber("Image Calibration (µm/px):", 0.16); Dialog.addToSameRow();
 	Dialog.addNumber("Image Binning:", 1);
 	
 // ====== IMAGE PREPROCESSING ======
-	Dialog.addMessage("Image Preprocessing", 16);
+	Dialog.addMessage("Preprocessing Settings", 16);
 	// Background subtraction
 	Dialog.addMessage("Background subtraction: Rolling Ball radius (µm)"); 
 	Dialog.addNumber("Nuclei:", 16.25); Dialog.addToSameRow();
