@@ -78,7 +78,7 @@ If your data are in proprietary formats (.czi, .vsi, .nd2, .lif, etc.), you can 
 
 ### Interactive Parameters
 
-<img width="612" height="626" alt="imagen" src="https://github.com/user-attachments/assets/06ac4adb-8c6c-4348-92cc-a7c7ffef3d9c" />
+<img width="707" height="800" alt="imagen" src="https://github.com/user-attachments/assets/50f9b064-cc68-4d5e-a3af-bb578a70a01f" />
 
 #### Input Data
 
