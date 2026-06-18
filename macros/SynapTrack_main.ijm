@@ -35,10 +35,10 @@
 // ====== EXPERIMENT DATA ======
 	Dialog.addMessage("Input Data", 16);
 	Dialog.addDirectory("Input images folder:", File.getDefaultDir);
-	Dialog.addString("Experiment Prefix:", "Exp");
+	Dialog.addString("Experiment Prefix:", "ExpExcit_01");
  Dialog.addToSameRow();
 	Dialog.addNumber("First ImageSet to analyze:", 1); Dialog.addToSameRow();
-	Dialog.addNumber("Last ImageSet to analyze:", "");
+	Dialog.addNumber("Last ImageSet to analyze:", 5);
 	Dialog.addChoice("Synapse type:", newArray("Excitatory","Inhibitory"), "Excitatory");
 	
 // ====== SPATIAL CALIBRATION ======
