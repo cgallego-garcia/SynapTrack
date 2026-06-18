@@ -17,7 +17,8 @@
  *  Minimal initialization and global constants. This section prepares Fiji
  *  and sets channel name patterns used across the macro.
  =========================================================================== */
-	requires("1.53f"); 		// Ensure the required ImageJ/Fiji version
+	requires("1.53f");
+ 		// Ensure the required ImageJ/Fiji version
 	pluginCheck();			// Ensure that the required plugins are installed
 	row = initWorkspace();	// Clean/initialize the workspace (defined below) and set Row index for summary table accumulation
 	
@@ -34,7 +35,8 @@
 // ====== EXPERIMENT DATA ======
 	Dialog.addMessage("Input Data", 16);
 	Dialog.addDirectory("Input images folder:", File.getDefaultDir);
-	Dialog.addString("Experiment Prefix:", "Exp"); Dialog.addToSameRow();
+	Dialog.addString("Experiment Prefix:", "Exp");
+ Dialog.addToSameRow();
 	Dialog.addNumber("First ImageSet to analyze:", 1); Dialog.addToSameRow();
 	Dialog.addNumber("Last ImageSet to analyze:", "");
 	Dialog.addChoice("Synapse type:", newArray("Excitatory","Inhibitory"), "Excitatory");
@@ -84,7 +86,8 @@
 	Dialog.addNumber("Max synapse size (µm²):", 1.1);
 	// Intensity thresholds
 	Dialog.addNumber("Min fill (0-1):", 0.5); Dialog.addToSameRow();
-	Dialog.addNumber("Max WH ratio:", 3); Dialog.addToSameRow();
+	Dialog.addNumber("Max WH ratio:", 3);
+ Dialog.addToSameRow();
 	// Advanced
 	Dialog.addNumber("zScore adjustment:", 10);
 // ====== Enlarge Dendrite Mask ======
@@ -99,7 +102,8 @@
 	inDir     = Dialog.getString();
  
 	outpuDir = inDir+"Results"+File.separator; File.makeDirectory(outpuDir);
-	expPrefix = Dialog.getString(); 
+	expPrefix = Dialog.getString();
+ 
 	firstIdx  = Dialog.getNumber();
 	lastIdx   = Dialog.getNumber();
 	sType     = Dialog.getChoice();
@@ -219,17 +223,19 @@
 		rb_sub(rollNuc, pxSize);	// rolling-ball background for nuclei
 		selectImage("dendrites");
 		rb_sub(rollDen, pxSize);	// rolling-ball background for dendrites
-		dendriteProcessing(blockSize, claheHist, claheMax); // CLAHE on dendrites
+		dendriteProcessing(blockSize, claheHist, claheMax, gaussian, pxSize); // CLAHE on dendrites
 		selectImage("postSyn");
 		rb_sub(rollSyn, pxSize);	// background for post-synaptic channel
 		selectImage("preSyn");
 		rb_sub(rollSyn, pxSize);	// background for pre-synaptic channel
 		
 	// Nuclei Segmentation and filtering based on StarDist
-		stardist2d_segment("nuclei", probT, nmsT, nTiles); // runs StarDist 2D
+		stardist2d_segment("nuclei", probT, nmsT, nTiles);
+ // runs StarDist 2D
 		
 	// filter ROIs and return count
-		nCells = nuclei_filter(minCell, maxCell, cirCell, outDir);
+		
+nCells = nuclei_filter(minCell, maxCell, cirCell, outDir);
 		
 	// Dendrite arborization: create a mask + remove nuclear regions
 		selectImage("dendrites");
@@ -623,7 +629,8 @@
 		return pxArea
 	}
 	
-	function pluginCheck() {
+	
+function pluginCheck() {
 		pluginsSynap = newArray("Bio-Formats", "StarDist 2D", "CSBDeep", "TensorFlow", "IJPB-plugins (MorpholibJ)","Neuroanatomy","SynQuant");
 		pluginsRequired = newArray("Bio-Formats", "StarDist 2D", "N2V predict",	"TensorFlow...", "MorphoLibJ...","Neuroanatomy Shortcut Window","SynQuantVid ");
 		List.setCommands;
