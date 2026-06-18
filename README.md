@@ -23,10 +23,7 @@ Built on the SynQuant segmentation engine, it performs fully unsupervised detect
 **Before using SynapTrack, make sure you have the following installed:**
 - **Fiji / ImageJ**  
   - Recommended versions: Fiji ≥ 2.16 / ImageJ ≥ 1.53f  
-  - [Download Fiji here]([https://imagej.net/software/fiji/downloads](https://imagej.net/software/fiji/downloads))
-    
-- **Java**  
-  - Version ≥ 8
+  - Download Fiji [here](https://imagej.net/software/fiji/downloads)
 
 - **Required Plugins** (install most plugins via `Fiji's Help > Update...` by activating the corresponding update site):
 
@@ -38,16 +35,19 @@ Built on the SynQuant segmentation engine, it performs fully unsupervised detect
 | TensorFlow | ≥ 0.6.0 |
 | IJPB plugins (MorphoLibJ) | ≥ 7.0.0 |
 | Neuronanatomy | ≥ 1.6.0 |
-| SynQuant | 1.2.8 |
+| [SynQuant](https://github.com/yu-lab-vt/SynQuant#getting-started) | 1.2.8 |
 > **Note:** SynQuant requires manual installation as follows:  
-> 1. Download the plugin from [SynQuant GitHub Repository](https://github.com/yu-lab-vt/SynQuant).
+> 1. Download the plugin from [SynQuant GitHub Repository](https://github.com/yu-lab-vt/SynQuant#getting-started).
 > 2. Copy it into: `Fiji.app/plugins`
 
 ---
 
 ### **Basic Use**
-1. **Download SynapTrack** and the associated macros from this repository.
-2. **Copy the `SynapTrack` folder** into the Fiji plugin directory: `Fiji.app/plugins`
+1. Download **SynapTrack** and the associated macros from this repository using the **<> Code → Download ZIP** option at the top of this repository.
+
+<img width="380" height="307" alt="imagen" src="https://github.com/user-attachments/assets/446bbf35-9fd5-434b-8347-9dd6b102beca" />
+
+2. **Extract and Copy the `SynapTrack` folder (SynapTrack-main)** into the Fiji plugin directory: `Fiji.app/plugins`
 3. Restart Fiji to ensure the plugin is recognized.
 
 4. Execute SynapTrack. It could be done in two-ways:
@@ -56,9 +56,14 @@ Built on the SynQuant segmentation engine, it performs fully unsupervised detect
 
     (B) SynapTrack will appear as an option under `Plugins > SynapTrack`
 
-5. Specify the parameters for your analysis (e.g., dendrite channel, synaptic channels, thresholds) and run the analysis.  
+5. SynapTrack can be tested using the sample images provided in `SynapTrack-Main/test_images`.
+
+> **IMPORTANT:** Before using the macro, please ensure that your images are named correctly. Refer to → [Image Preparation](https://github.com/cgallego-garcia/SynapTrack#image-preparation)
+
+6. Specify the parameters for your analysis (e.g., dendrite channel, synaptic channels, thresholds) and run the analysis.  
    - *Adjust parameters (*see Interactive Parameters panel below*) as needed.*
-6. Run the analysis to generate synaptic density and associated metrics.
+7. Run the analysis to generate synaptic density and associated metrics.
+8. Once the analysis is complete, a `Results` folder will be created within the image directory, following the structure described in → [Outputs](https://github.com/cgallego-garcia/SynapTrack#Outputs).
 
 ---
 
@@ -68,9 +73,17 @@ SynapTrack expects files to follow this naming convention: `<ExpPrefix>_<Channel
 
 Where:
 
-   - `<ExpPrefix>` - Experiment identifier (e.g., Exp01)
+   - `<ExpPrefix>` - Experiment identifier (e.g., ExpInhib_01 | ExpExcit_01)
    - `<Channel>` - Specifies the marker one of the following (preEx, preInh, postEx, postInh, MAP2, or DAPI)
    - `<Index>` - two-digit replicate identifier (e.g., 01, 02)
+
+#### - Example of Inhibitory images:
+
+`ExpInhib_01_DAPI_01.tif | ExpInhib_01_MAP2_01.tif | ExpInhib_01_preInh_01.tif | ExpInhib_01_postInh_01.tif`
+
+#### - Example of Excitatory images:
+
+`ExpExcit_01_DAPI_01.tif | ExpExcit_01_MAP2_01.tif | ExpExcit_01_preEx_01.tif | ExpExcit_01_postEx_01.tif`
 
 If your data are in proprietary formats (.czi, .vsi, .nd2, .lif, etc.), you can run `SynapTrack_FileConversion.ijm` to generate SynapTrack-compatible TIFF files.
 
@@ -117,19 +130,19 @@ If your data are in proprietary formats (.czi, .vsi, .nd2, .lif, etc.), you can 
 
 ### Outputs
 
-SynapTrack generates a Results folder containing:
 
-Top-level
+Upon completion of the analysis, SynapTrack generates a `Results` folder inside the analyzed image folder containing:
 
--   Results.xls — global summary of all image sets
+- `Results.xls` – Summary table for all analyzed image sets.
 
--   Per-image subfolder (Image_/)
-      - Dendrite_enlarged.tif
-      - Dendrite_skeleton.tif
-      - Dendrite_stats.csv
-      - ROIset_nuclei.zip
-      - ROIset_Synapse.zip
-      - SynapseDetection.tif
+Each analyzed image set generates an `Image_/` subfolder containing:
+
+- `Dendrite_enlarged.tif`
+- `Dendrite_skeleton.tif`
+- `Dendrite_stats.csv`
+- `ROIset_nuclei.zip`
+- `ROIset_Synapse.zip`
+- `SynapseDetection.tif`
 
 Example:
 
@@ -149,4 +162,6 @@ Example:
 - Added defensive checks for missing Results and Summary tables
 - Improved error messages and safe termination
 
+### v1.1
+- Added Plugin availability check function in SynapTrack macros
 
