@@ -58,7 +58,7 @@ Built on the SynQuant segmentation engine, it performs fully unsupervised detect
 
 5. SynapTrack can be tested using the sample images provided in `SynapTrack-Main/test_images`.
 
-> **IMPORTANT:** Before using the macro, please ensure that your images are named correctly. Refer to → [Image Preparation](https://github.com/cgallego-garcia/SynapTrack#image-preparation)
+> **IMPORTANT:** Before using the macro, please ensure that your images are named correctly. Refer to → [Image Preparation](https://github.com/cgallego-garcia/SynapTrack#Image-Preparation)
 
 6. Specify the parameters for your analysis (e.g., dendrite channel, synaptic channels, thresholds) and run the analysis.  
    - *Adjust parameters (*see Interactive Parameters panel below*) as needed.*
