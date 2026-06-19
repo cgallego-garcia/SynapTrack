@@ -14,7 +14,7 @@ Built on the SynQuant segmentation engine, it performs fully unsupervised detect
 * Fully automated segmentation and synapse detection
 * Compatible with both cultured neurons and tissue sections
 * Based on SynQuant with multiple channels
-* Export of synaptic density per cell and per dendrite length and dendrite measurements
+* Export of synapse number per cell and per dendrite length and dendrite measurements
 
 ---
 
@@ -37,171 +37,167 @@ Built on the SynQuant segmentation engine, it performs fully unsupervised detect
 | Neuronanatomy | ≥ 1.6.0 |
 | [SynQuant](https://github.com/yu-lab-vt/SynQuant#getting-started) | 1.2.8 |
 > **Note:** SynQuant requires manual installation as follows:  
-> 1. Download the plugin from [SynQuant GitHub Repository](https://github.com/yu-lab-vt/SynQuant#getting-started).
+> 1. Download the file `SynQuantVid_-1.2.8.jar` from [SynQuant GitHub Repository](https://github.com/yu-lab-vt/SynQuant/releases).
 > 2. Copy it into: `Fiji.app/plugins`
 
 ---
 
 ### **Basic Use**
-1. Download **SynapTrack** and the associated macros from this repository using the **<> Code → Download ZIP** option at the top of this repository.
+1. Download **SynapTrack-main.zip** by clicking the **<> Code → Download ZIP** option at the top of this repository.
 
 <img width="380" height="307" alt="imagen" src="https://github.com/user-attachments/assets/446bbf35-9fd5-434b-8347-9dd6b102beca" />
 
-2. **Extract and Copy the `SynapTrack` folder (SynapTrack-main)** into the Fiji plugin directory: `Fiji.app/plugins`
+2. **Extract and Copy `SynapTrack-main` folder** into the Fiji plugin directory: `Fiji.app/plugins`
 
-3. Restart Fiji to ensure the plugin is recognized.
+3. Restart Fiji to ensure the plugin is loaded.
 
 4. Execute SynapTrack. It could be done in two-ways:
 
-    (A) Drag and drop the `SynapTrack.ijm` file and press `Run`
+    (A) Drag and drop the `SynapTrack.ijm` file within main FIJI window and press `Run`
 
-    (B) SynapTrack will appear as an option under `Plugins > SynapTrack`
+    (B) Click SynapTrack option under `Plugins > SynapTrack`
 
-5. SynapTrack can be tested using the sample images provided in `SynapTrack-Main/test_images`.
+5. SynapTrack example analysis can be done using the sample images provided in `SynapTrack-Main/test_images`. 
 
-> **IMPORTANT:** Before using the macro, please ensure that your images are named correctly. Refer to → [Image Preparation](https://github.com/cgallego-garcia/SynapTrack#Image-Preparation)
+    A [workflow example](https://github.com/cgallego-garcia/SynapTrack#Example-Workflow) could be found at the bottom of this repository
 
-6. Specify the parameters for your analysis (e.g., dendrite channel, synaptic channels, thresholds) and run the analysis.  
-   - *Adjust parameters (*see [Interactive Parameters panel](https://github.com/cgallego-garcia/SynapTrack#Interactive-Parameters)*) as needed.*
+> **IMPORTANT:** Before running the macro, please ensure that the images file names have the correct syntax. Refer to → [Image Preparation](https://github.com/cgallego-garcia/SynapTrack#Image-Preparation)
 
-7. Run the analysis to generate synaptic density and associated metrics.
+6. Run SynapTrack and specify the parameters for your analysis in the [StartUp panel](https://github.com/cgallego-garcia/SynapTrack#StartUp-Panel) (e.g., dendrite channel, synaptic channels, thresholds).
 
-8. Once the analysis is complete, a `Results` folder will be created within the image directory, following the structure described in → [Outputs](https://github.com/cgallego-garcia/SynapTrack#Output-structure).
+7. Run SynapTrack analysis.
 
-A [workflow example](https://github.com/cgallego-garcia/SynapTrack#Example-Workflow) could be found at the bottom of this repository
+8. Once the analysis is complete, a `Results` folder will be created within the image folder, following the [Output structure](https://github.com/cgallego-garcia/SynapTrack#Output-structure).
 
 ---
 
 ### Image Preparation
 
-SynapTrack expects files to follow this naming convention: `<ExpPrefix>_<Channel>_<Index>.tif`
+SynapTrack requires image filenames with the following syntax: `<ExpPrefix>_<Channel>_<Index>.tif`
 
 Where:
 
-   - `<ExpPrefix>` - Experiment identifier (e.g., ExpInhib_01 | ExpExcit_01)
-   - `<Channel>` - Specifies the marker one of the following (preEx, preInh, postEx, postInh, MAP2, or DAPI)
-   - `<Index>` - two-digit replicate identifier (e.g., 01, 02)
+   - `<ExpPrefix>` - User-defined experiment identifier (e.g., ExpInhib_01 | ExpExcit_01).
+   - `<Channel>` - Must be one of the following markers: preEx, preInh, postEx, postInh, MAP2, or DAPI.
+   - `<Index>` - Must be a two-digit replicate identifier starting at 01.
 
-#### - Example of Inhibitory images:
+#### - Example of Inhibitory set of images:
 
-`ExpInhib_01_DAPI_01.tif | ExpInhib_01_MAP2_01.tif | ExpInhib_01_preInh_01.tif | ExpInhib_01_postInh_01.tif`
+    `ExpInhib_01_DAPI_01.tif | ExpInhib_01_MAP2_01.tif | ExpInhib_01_preInh_01.tif | ExpInhib_01_postInh_01.tif`
 
-#### - Example of Excitatory images:
+#### - Example of Excitatory set of images:
 
-`ExpExcit_01_DAPI_01.tif | ExpExcit_01_MAP2_01.tif | ExpExcit_01_preEx_01.tif | ExpExcit_01_postEx_01.tif`
+    `ExpExcit_01_DAPI_01.tif | ExpExcit_01_MAP2_01.tif | ExpExcit_01_preEx_01.tif | ExpExcit_01_postEx_01.tif`
 
-If your data are in proprietary formats (.czi, .vsi, .nd2, .lif, etc.), you can run `SynapTrack_FileConversion.ijm` to generate SynapTrack-compatible TIFF files.
+Use `SynapTrack_FileConversion.ijm` to generate SynapTrack-compatible TIFF files, if your data are in proprietary formats (.czi, .vsi, .nd2, .lif, etc.).
 
 ---
 
-## Interactive Parameters
-
-The following panel is used to configure SynapTrack before running the analysis.
+## StartUp Panel
 
 <img width="707" height="800" alt="imagen" src="https://github.com/user-attachments/assets/50f9b064-cc68-4d5e-a3af-bb578a70a01f" />
 
 #### Input Data
 
--   Input images folder
--   Experiment prefix
+-   Input images folder: Enter the folder of your image files.
+-   Experiment prefix: User-defined experiment identifier
 -   Image index range (First-Last image sets to be analysed)
--   Synapse type (excitatory / inhibitory)
+-   Synapse type: Either Excitatory or Inhibitory
 
-#### Image Calibration *(If images are not calibrated)*
+#### Image Calibration *(Only if images are not calibrated)*
 -   Pixel size (µm/pixel)
 -   Camera binning (if metadata is missing)
 
 #### Image Preprocessing
 
--   Dendrite-specific CLAHE and Channel-specific background subtraction
--   Background subtraction rolling ball radii defined in µm
--   Z-stack processing: Max Intensity or Sum of Slices
+-   Background subtraction: Rolling ball radii (defined in µm for Nuclei, Synapses and Dendrites)
+-   Enhanced Local Contrast Dendrites: Block size, Histogram bins and Maximum Slope
+-   Dendrites Gaussian filter: Sigma filter (µm)
+-   Z-stack processing. Z-handling: Max Intensity (MaxIP) or Sum of Slices (SumSlices)
 
 #### Nuclei Segmentation
 
 -   StarDist-based detection in nuclei (DAPI) images
--   Size (in µm) and circularity filtering
--   Automated cell counting
+-   Nuceli Area (in µm²) and Nuclei circularity
 
 #### SynQuant
 
--   z-score threshold
--   Size (µm²) and roundness filters for puncta
+-   z-score threshold and zScore adjustment for probabilistic puncta selection
+-   Min and Max Synapse size (µm²) and Max roundness (WH) ratio for puncta
 
 #### Dendrite Mask
 
--   Expansion of MAP2 mask by a user-defined distance
--   Ensures detection of puncta near dendrites
+-   Enlarge by (µm): Expands the MAP2 mask to ensure detection of puncta close to dendrites
 
 ---
 
 ## Example Workflow
 
-This example demonstrates the analysis of inhibitory synapses in cultured neurons using the sample dataset located in:
+This example shows the analysis of inhibitory synapses in cultured neurons from `ExpInhib_01` dataset located in:
 
 `SynapTrack-main/test_images/neuronal_cultures/inhibitory`
 
 ### Input Images
 
-For each field of view, SynapTrack requires four images:
+For each replicate, SynapTrack requires four images:
 
 | Channel | Marker | Function |
 |----------|----------|----------|
 | DAPI | Cell nuclei | Cell counting |
-| MAP2 | Dendrites | Dendrite segmentation and length measurements |
+| MAP2 | Dendrites | Dendrite segmentation and length measurement |
 | preInh | Presynaptic marker (e.g., VGAT) | Presynaptic puncta detection |
 | postInh | Postsynaptic marker (e.g., Gephyrin) | Postsynaptic puncta detection |
 
-Example image set:
+-Example image replicate:
 
-`ExpInhib_01_DAPI_01.tif | ExpInhib_01_MAP2_01.tif | ExpInhib_01_preInh_01.tif | ExpInhib_01_postInh_01.tif`
+    `ExpInhib_01_DAPI_01.tif | ExpInhib_01_MAP2_01.tif | ExpInhib_01_preInh_01.tif | ExpInhib_01_postInh_01.tif`
 
 ### Running the Analysis
 
-1. Open SynapTrack in Fiji.
-2. Select the folder containing the example images.
+1. Run SynapTrack in Fiji.
+2. Input the folder containing the example images.
 3. Set:
    - Experiment prefix: `ExpInhib_01`
    - First image index: `01`
-   - Last image index: `03` (or last available image)
+   - Last image index: `05`
    - Synapse type: `Inhibitory`
-4. Use default parameters for the first test run.
+4. Use the default parameters for the first test run.
 5. Click **Run**.
 
 ### Output structure
 
-Upon completion of the analysis, SynapTrack generates a `Results` folder inside the analyzed image folder containing:
+Upon analysis completion, SynapTrack generates a `Results` folder inside the image folder containing:
 
-### Results File
-
-The final output file `Results.xls` is a summary table for all analyzed image sets containing:
-
-- Number of detected cells
-- Number of synaptic contacts
-- Synapses per cell
-- Total dendrite length (µm)
-- Synapses per 10 µm dendrite length
-
-Each analyzed image set generates an `Image_/` subfolder containing:
-
-- Dendrite mask - `Dendrite_enlarged.tif`
-- Dendrite skeleton - `Dendrite_skeleton.tif`
-- Dendrite measurements - `Dendrite_stats.csv`
-- Nuclei segmentation (ROIs) -`ROIset_nuclei.zip`
-- Synapse ROIs - `ROIset_Synapse.zip`
-- Synapse detection overlay images - `SynapseDetection.tif`
-
-Example:
-
-    Results/
-        Results.xls
-        1/
-            Dendrite_enlarged.tif
-            Dendrite_skeleton.tif
-            Dendrite_stats.csv
-            ROIset_nuclei.zip
-            ROIset_Synapse.zip
-            SynapseDetection.tif
+    #### Results File
+    
+    The final output file `Results.xls` is a summary table for all image replicates containing:
+    
+        - Number of detected cells
+        - Number of synaptic contacts
+        - Synapses per cell
+        - Total dendrite length (µm)
+        - Synapses per 10 µm dendrite length
+    
+    Each analyzed image relpicate generates a subfolder containing:
+    
+        - Dendrite mask - `Dendrite_enlarged.tif`
+        - Dendrite skeleton - `Dendrite_skeleton.tif`
+        - Dendrite measurements - `Dendrite_stats.csv`
+        - Nuclei segmentation (ROIs) -`ROIset_nuclei.zip`
+        - Synapse ROIs - `ROIset_Synapse.zip`
+        - Synapse detection overlay images - `SynapseDetection.tif`
+    
+    Example:
+    
+        Results/
+            Results.xls
+            1/
+                Dendrite_enlarged.tif
+                Dendrite_skeleton.tif
+                Dendrite_stats.csv
+                ROIset_nuclei.zip
+                ROIset_Synapse.zip
+                SynapseDetection.tif
 
 ---
 
