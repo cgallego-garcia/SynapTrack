@@ -95,7 +95,8 @@ Use `SynapTrack_FileConversion.ijm` to generate SynapTrack-compatible TIFF files
 
 ## StartUp Panel
 
-<img width="707" height="800" alt="imagen" src="https://github.com/user-attachments/assets/50f9b064-cc68-4d5e-a3af-bb578a70a01f" />
+<img width="806" height="925" alt="image" src="https://github.com/user-attachments/assets/e8e4c4bc-06d3-4191-9079-ed684a45ec0f" />
+
 
 #### Input Data
 
