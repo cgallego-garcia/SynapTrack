@@ -46,7 +46,7 @@
 	Dialog.addChoice("Are the images Calibrated?", newArray("Yes","No"), "Yes"); Dialog.addToSameRow();
 	Dialog.addMessage("If not, please introduce the following:");
 	Dialog.addNumber("Image Calibration (µm/px):", 0.16); Dialog.addToSameRow();
-	Dialog.addNumber("Image Binning:", 1);
+	Dialog.addNumber("Camera Binning:", 1);
 	
 // ====== IMAGE PREPROCESSING ======
 	Dialog.addMessage("Preprocessing Settings", 16);
