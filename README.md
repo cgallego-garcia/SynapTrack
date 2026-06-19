@@ -169,36 +169,36 @@ For each replicate, SynapTrack requires four images:
 
 Upon analysis completion, SynapTrack generates a `Results` folder inside the image folder containing:
 
-    #### Results File
-    
-    The final output file `Results.xls` is a summary table for all image replicates containing:
-    
-        - Number of detected cells
-        - Number of synaptic contacts
-        - Synapses per cell
-        - Total dendrite length (µm)
-        - Synapses per 10 µm dendrite length
-    
-    Each analyzed image relpicate generates a subfolder containing:
-    
-        - Dendrite mask - `Dendrite_enlarged.tif`
-        - Dendrite skeleton - `Dendrite_skeleton.tif`
-        - Dendrite measurements - `Dendrite_stats.csv`
-        - Nuclei segmentation (ROIs) -`ROIset_nuclei.zip`
-        - Synapse ROIs - `ROIset_Synapse.zip`
-        - Synapse detection overlay images - `SynapseDetection.tif`
-    
-    Example:
-    
-        Results/
-            Results.xls
-            1/
-                Dendrite_enlarged.tif
-                Dendrite_skeleton.tif
-                Dendrite_stats.csv
-                ROIset_nuclei.zip
-                ROIset_Synapse.zip
-                SynapseDetection.tif
+#### Results File
+
+The final output file `Results.xls` is a summary table for all image replicates containing:
+
+  - Number of detected cells
+  - Number of synaptic contacts
+  - Synapses per cell
+  - Total dendrite length (µm)
+  - Synapses per 10 µm dendrite length
+
+Each analyzed image relpicate generates a subfolder containing:
+
+  - Dendrite mask - `Dendrite_enlarged.tif`
+  - Dendrite skeleton - `Dendrite_skeleton.tif`
+  - Dendrite measurements - `Dendrite_stats.csv`
+  - Nuclei segmentation (ROIs) -`ROIset_nuclei.zip`
+  - Synapse ROIs - `ROIset_Synapse.zip`
+  - Synapse detection overlay images - `SynapseDetection.tif`
+
+Example:
+
+    Results/
+        Results.xls
+        1/
+            Dendrite_enlarged.tif
+            Dendrite_skeleton.tif
+            Dendrite_stats.csv
+            ROIset_nuclei.zip
+            ROIset_Synapse.zip
+            SynapseDetection.tif
 
 ---
 
