@@ -30,13 +30,17 @@ Built on the SynQuant segmentation engine, it performs fully unsupervised detect
 | Plugin | Version |
 |--------|---------|
 | Bio-Formats | ≥ 8.0.0 |
-| StarDist 2D | ≥ 0.3.0 |
+| StarDist 2D (*) | ≥ 0.3.0 |
 | CSBDeep | ≥ 0.6.0 |
 | TensorFlow | ≥ 1.12.0 |
 | IJPB plugins (MorphoLibJ) | ≥ 1.6.5 |
 | Neuronanatomy (SNT) | ≥ 5.0.12 |
 | [SynQuant](https://github.com/yu-lab-vt/SynQuant#getting-started) | 1.2.8 |
-> **Note:** SynQuant requires manual installation as follows:  
+
+> (*) Apple Silicon (M-series Macs): StarDist may not run with the native ARM version of Fiji. Use the Intel (x86_64) version of Fiji running under Rosetta. This is an upstream StarDist/TensorFlow compatibility issue and is not caused by SynapTrack.
+
+> [!NOTE]
+> SynQuant requires manual installation as follows:  
 > 1. Download the file `SynQuantVid_-1.2.8.jar` from [SynQuant GitHub Repository](https://github.com/yu-lab-vt/SynQuant/releases).
 > 2. Copy it into: `Fiji.app/plugins`
 
