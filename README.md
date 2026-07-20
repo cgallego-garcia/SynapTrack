@@ -37,7 +37,7 @@ Built on the SynQuant segmentation engine, it performs fully unsupervised detect
 | Neuronanatomy (SNT) | ≥ 5.0.12 |
 | [SynQuant](https://github.com/yu-lab-vt/SynQuant#getting-started) | 1.2.8 |
 
-> (*) Apple Silicon (M-series Macs): StarDist may not run with the native ARM version of Fiji. Use the Intel (x86_64) version of Fiji running under Rosetta. This is an upstream StarDist/TensorFlow compatibility issue and is not caused by SynapTrack.
+> (*) Apple Silicon (M-series Macs): StarDist may not run with the native ARM version of Fiji. Use the Intel (x86_64) version of Fiji running under Rosetta. This is a StarDist/TensorFlow compatibility issue not caused by SynapTrack.
 
 > [!NOTE]
 > SynQuant requires manual installation as follows:  
